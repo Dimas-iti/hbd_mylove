@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Selamat Ulang Tahun Silvi</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
@@ -30,39 +30,53 @@
     .animated-text {
       animation: pulseText 2.5s ease-in-out infinite;
     }
+
+    /* Iframe musik diletakkan offscreen tapi tetap visible */
+    #musicPlayer {
+      position: fixed;
+      width: 1px;
+      height: 1px;
+      left: -9999px;
+      top: -9999px;
+      opacity: 0.01; /* Hampir transparan tapi visible */
+      pointer-events: none;
+      z-index: -10;
+    }
+
+    /* Tombol play */
+    #startScreen {
+      position: fixed;
+      inset: 0;
+      background: rgba(255 255 255 / 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
   </style>
 </head>
 <body class="flex items-center justify-center p-6 relative">
 
-  <!-- Pemutar Musik YouTube (tersembunyi) -->
-  <div class="hidden">
-    <iframe 
-      id="musicPlayer"
-      width="0" 
-      height="0" 
-      src="https://www.youtube.com/embed/8hxlRWW3unA?enablejsapi=1&autoplay=0&mute=1&loop=1&playlist=8hxlRWW3unA&playsinline=1" 
-      frameborder="0"
-      allow="autoplay; encrypted-media"
-    ></iframe>
-  </div>
+  <!-- Pemutar Musik YouTube (posisi offscreen tapi visible) -->
+  <iframe 
+    id="musicPlayer"
+    src="https://www.youtube.com/embed/8hxlRWW3unA?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=8hxlRWW3unA&playsinline=1"
+    frameborder="0"
+    allow="autoplay; encrypted-media"
+    allowfullscreen
+  ></iframe>
 
   <!-- Tombol Play Tengah -->
-  <div id="startScreen" class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-70 z-50">
+  <div id="startScreen">
     <button id="startBtn" class="bg-pink-600 text-white px-10 py-6 rounded-full text-3xl shadow-lg hover:bg-pink-700 transition-all duration-300">
       ▶️ Putar Ucapan
     </button>
   </div>
 
-  <!-- Kartu Ucapan (tersembunyi sampai Play diklik) -->
+  <!-- Kartu Ucapan (disembunyikan sampai play) -->
   <div id="mainContent" class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-6 md:p-10 text-center fade-in hidden">
-    
-    <!-- Ikon Romantis -->
     <div class="text-6xl mb-6">🎁🌹💖</div>
-    
-    <!-- Judul -->
     <h1 class="text-4xl romantic-font text-pink-600 mb-4 animated-text">Selamat Ulang Tahun, Sayangku 💖</h1>
-    
-    <!-- Pesan -->
     <p id="typedText" class="text-lg md:text-xl text-gray-700 leading-relaxed whitespace-pre-line animated-text"></p>
   </div>
 
@@ -81,33 +95,42 @@ Selamat ulang tahun Silvia Mulianingsih 🎂, I LOVE YOU 💖. `;
       }
     }
 
-    // YouTube Player API
+    // Load YouTube Iframe API
     let player;
     function onYouTubeIframeAPIReady() {
       player = new YT.Player('musicPlayer', {
         events: {
-          'onReady': (event) => { 
-            event.target.mute(); // Mulai dalam keadaan mute supaya autoplay tidak diblokir
+          'onReady': function(event) {
+            event.target.mute();
+            console.log("Player siap dan mute.");
+          },
+          'onStateChange': function(event) {
+            // Bisa ditambahkan log untuk debugging
+            console.log('Player state berubah:', event.data);
           }
         }
       });
     }
 
-    // Load YouTube IFrame API script
+    // Inject API script
     const tag = document.createElement('script');
     tag.src = "https://www.youtube.com/iframe_api";
     document.body.appendChild(tag);
 
-    // Tombol Play klik event
     document.getElementById("startBtn").addEventListener("click", () => {
-      document.getElementById("startScreen").classList.add("hidden");
+      // Tampilkan kartu ucapan dan sembunyikan tombol
+      document.getElementById("startScreen").style.display = "none";
       document.getElementById("mainContent").classList.remove("hidden");
 
-      if (player && player.unMute) {
+      // Mulai mainkan musik dan unmute
+      if (player) {
         player.unMute();
         player.playVideo();
+      } else {
+        console.warn("Player belum siap, coba lagi sebentar.");
       }
 
+      // Mulai ketik teks
       typeWriter();
     });
   </script>
