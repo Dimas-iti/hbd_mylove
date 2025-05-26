@@ -40,9 +40,9 @@
       id="musicPlayer"
       width="0" 
       height="0" 
-      src="https://www.youtube.com/embed/8hxlRWW3unA?enablejsapi=1&autoplay=0&mute=1&loop=1&playlist=8hxlRWW3unA" 
+      src="https://www.youtube.com/embed/8hxlRWW3unA?enablejsapi=1&autoplay=0&mute=1&loop=1&playlist=8hxlRWW3unA&playsinline=1" 
       frameborder="0"
-      allow="autoplay"
+      allow="autoplay; encrypted-media"
     ></iframe>
   </div>
 
@@ -68,9 +68,9 @@
 
   <script>
     const message = `Hari ini di hari ulang tahunmu, Aku cuma mau kamu tau bahwa aku bersyukur bisa menjadi bagian dalam hidupmu, 
-    Dan semoga aku bisa terus jadi bagian dari itu.
-    Semoga di umur yang baru ini, semua harapan kebaikanmu tercapai, sehat dan bahagia selalu, dan dikelilingi hal-hal baik.
-    Selamat ulang tahun Silvia Mulianingsih 🎂, I LOVE YOU 💖. `;
+Dan semoga aku bisa terus jadi bagian dari itu.
+Semoga di umur yang baru ini, semua harapan kebaikanmu tercapai, sehat dan bahagia selalu, dan dikelilingi hal-hal baik.
+Selamat ulang tahun Silvia Mulianingsih 🎂, I LOVE YOU 💖. `;
 
     let i = 0;
     function typeWriter() {
@@ -81,21 +81,24 @@
       }
     }
 
-    // Load YouTube API
+    // YouTube Player API
     let player;
     function onYouTubeIframeAPIReady() {
       player = new YT.Player('musicPlayer', {
         events: {
-          'onReady': () => { player.mute(); }
+          'onReady': (event) => { 
+            event.target.mute(); // Mulai dalam keadaan mute supaya autoplay tidak diblokir
+          }
         }
       });
     }
 
+    // Load YouTube IFrame API script
     const tag = document.createElement('script');
     tag.src = "https://www.youtube.com/iframe_api";
     document.body.appendChild(tag);
 
-    // Saat Tombol Play Diklik
+    // Tombol Play klik event
     document.getElementById("startBtn").addEventListener("click", () => {
       document.getElementById("startScreen").classList.add("hidden");
       document.getElementById("mainContent").classList.remove("hidden");
